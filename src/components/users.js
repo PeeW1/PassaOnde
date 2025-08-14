@@ -29,16 +29,16 @@ export default function Users({ navigation }) {
     useEffect(()=> {
         const fetchData = async () => {
             try {
-                const resMotorista = await fetch('http://192.168.0.108:3000/motoristas')
+                const resMotorista = await fetch('http://192.168.0.218:3000/motoristas')
                 const jsonMotorista = await resMotorista.json();
 
-                const resEscola = await fetch('http://192.168.0.108:3000/escolas')
+                const resEscola = await fetch('http://192.168.0.218:3000/escolas')
                 const jsonEscola = await resEscola.json();
 
-                const resTurno = await fetch('http://192.168.0.108:3000/turnos')
+                const resTurno = await fetch('http://192.168.0.218:3000/turnos')
                 const jsonTurno = await resTurno.json();
 
-                const resSearchLinha = await fetch('http://192.168.0.108:3000/buscar-linha')
+                const resSearchLinha = await fetch('http://192.168.0.218:3000/buscar-linha')
                 const jsonSearchLinha = await resSearchLinha.json();
                 
                 setMotorista(jsonMotorista)

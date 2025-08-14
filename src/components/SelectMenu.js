@@ -22,18 +22,19 @@ export default function SelectMenu({ navigation }) {
     useEffect(()=> {
         const fetchData = async () => {
             try {
-                const resMotorista = await fetch('http://192.168.0.108:3000/motoristas')
+                const resMotorista = await fetch('http://192.168.0.218:3000/motoristas')
                 const jsonMotorista = await resMotorista.json();
 
-                const resEscola = await fetch('http://192.168.0.108:3000/escolas')
-                const jsonEscola = await resEscola.json();
+                const resEscola = await fetch('http://192.168.0.218:3000/escolas')
+                const jsonEscola = await resEscola.json(); 
 
-                const resTurno = await fetch('http://192.168.0.108:3000/turnos')
+                const resTurno = await fetch('http://192.168.0.218:3000/turnos')
                 const jsonTurno = await resTurno.json();
                 
                 setMotorista(jsonMotorista)
-                setEscola(jsonEscola)
+                setEscola(jsonEscola) 
                 setTurno(jsonTurno) 
+                console.log(jsonMotorista, jsonEscola, )
             }catch (error) {
                 console.error('Erro ao buscar dados:', error);
             }
@@ -69,7 +70,7 @@ export default function SelectMenu({ navigation }) {
     async function searchLinha( escola, turno) {
         console.log( escola, turno)
         try {
-            const resLinha = await fetch(`http://192.168.0.108:3000/linhas?escola=${escola}&turno=${turno}`)
+            const resLinha = await fetch(`http://192.168.0.218:3000/linhas?escola=${escola}&turno=${turno}`)
             const reqLinha = await resLinha.json();
             setReturnLinha(reqLinha)
         }catch (error) {

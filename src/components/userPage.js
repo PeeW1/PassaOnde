@@ -24,7 +24,7 @@ export default function UserPage({ navigation }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-            const response = await fetch('http://192.168.0.108:3000/filter-name-school', {
+            const response = await fetch('http://192.168.0.218:3000/filter-name-school', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

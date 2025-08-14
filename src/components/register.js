@@ -27,13 +27,13 @@ export default function Register( { navigation }) {
     useEffect(()=> {
         const fetchData = async () => {
             try {
-                const resMotorista = await fetch('http://192.168.0.108:3000/motoristas')
+                const resMotorista = await fetch('http://192.168.0.218:3000/motoristas')
                 const jsonMotorista = await resMotorista.json();
 
-                const resEscola = await fetch('http://192.168.0.108:3000/escolas')
+                const resEscola = await fetch('http://192.168.0.218:3000/escolas')
                 const jsonEscola = await resEscola.json();
 
-                const resTurno = await fetch('http://192.168.0.108:3000/turnos')
+                const resTurno = await fetch('http://192.168.0.218:3000/turnos')
                 const jsonTurno = await resTurno.json();
                 
                 setMotorista(jsonMotorista)
@@ -69,7 +69,7 @@ export default function Register( { navigation }) {
     
     const registerMotorista = async () => {
         try {
-            const response = await fetch('http://192.168.0.108:3000/cadastrar-motorista', {
+            const response = await fetch('http://192.168.0.218:3000/cadastrar-motorista', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ export default function Register( { navigation }) {
             <View>
                 <Pressable
                 style={styles.button1}
-                onPress={() => registerMotorista(name, schools)}
+                onPress={() => registerMotorista(name, username, password, schools)}
                 >
                       <Text style={{color:'white'}}>Cadastrar</Text>                  
                 </Pressable>

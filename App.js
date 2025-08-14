@@ -31,7 +31,7 @@ export default function App() {
           animation: 'ios_from_left',
       }} 
       >
-        {/* <Stack.Screen name="Auth" component={Auth} /> */}
+        <Stack.Screen name="Auth" component={Auth} />  
         <Stack.Screen name="Bem-Vindo" component={Main} />
         <Stack.Screen name="Cadastrar" component={Register} />
         <Stack.Screen name="Linhas" component={SelectMenu} />

@@ -1,7 +1,7 @@
-const express = require('express');
-const mysql = require('mysql2');
-const dotenv = require('dotenv');
-const bcrypt = require('bcrypt');
+import express  from 'express'
+import mysql  from 'mysql2'
+import dotenv from 'dotenv'
+import bcrypt from 'bcrypt'
 const saltRounds = 10;
 
 
@@ -27,6 +27,7 @@ db.connect((err) => {
   console.log('Conectado ao banco de dados MySQL!');
 });
 
+const dbPromise = db.promise()
 
 
 app.get('/motoristas', async (req, res) => {
@@ -84,7 +85,7 @@ app.get('/linhas', async (req, res) => {
     db.query(`SELECT me.motorista_id, m.nome FROM motorista_escola as me 
       JOIN motoristas as m ON me.motorista_id = m.id  
       WHERE  escola_id = ? AND turno = ?;`, 
-      [ escola, turno], (err, results) => {
+      [escola, turno], (err, results) => {
       console.log('Resultados:', results);
       if (err) {
         console.error('Erro ao buscar linhas:', err);
@@ -101,39 +102,53 @@ app.get('/linhas', async (req, res) => {
 
 app.post('/cadastrar-motorista', async(req, res) => {
   const { nome, username, password, escolaManha, escolaMeiodia, escolaTarde, escolas } = req.body;
+  console.log(nome, username, password, escolas)
   try {
-    bcrypt.genSalt( saltRounds ,  function ( err ,  salt )  { 
-      bcrypt.hash(password,  salt ,  function ( err ,  hash )  { 
-          db.query('INSERT INTO ') 
-      }); 
-    });
-    db.query('INSERT INTO motoristas (nome) VALUES (?)', [nome], (err, results) => {
+      bcrypt.genSalt(saltRounds, function (err, salt) {
       if (err) {
-        console.error("Erro ao cadastrar motorista:", err);
-        res.status(500).json({ error: 'Erro ao cadastrar motorista' });
-        return;
+        console.error('Erro ao gerar salt:', err);
+        return res.status(500).json({ error: 'Erro ao gerar salt' });
       }
 
-      
-      escolas.forEach((escola) => {
-        db.query('INSERT INTO motorista_escola (motorista_id, escola_id, turno) VALUES (?,?,?)', [results.insertId, escola.id, escola.turno], (err, results) => {
-          if (err) {
-            console.error(`Erro ao cadastrar motorista na escola ${escola.nome} no turno ${escola.turno}:`, err);
-            res.status(500).json({ error: `Erro ao cadastrar motorista na escola ${escola.nome} no turno ${escola.turno}` });
-            return;
+      bcrypt.hash(password, salt, function (err, hash) {
+        if (err) {
+          console.error('Erro ao gerar hash da senha:', err);
+          return res.status(500).json({ error: 'Erro ao gerar hash da senha' });
+        }
+        db.query(
+          'INSERT INTO motoristas (nome, usuario, senha) VALUES (?, ?, ?)',
+          [nome, username, hash],
+          (err, results) => {
+            if (err) {
+              console.error('Erro ao cadastrar motorista:', err);
+              return res.status(500).json({ error: 'Erro ao cadastrar motorista' });
+            }
+            const motoristaId = results.insertId;
+            escolas.forEach((escola) => {
+              db.query(
+                'INSERT INTO motorista_escola (motorista_id, escola_id, turno) VALUES (?, ?, ?)',
+                [motoristaId, escola.id, escola.turno],
+                (err) => {
+                  if (err) {
+                    console.error(`Erro ao cadastrar motorista na escola ${escola.nome} no turno ${escola.turno}:`, err);
+                  }
+                }
+              ); 
+            });
+            res.status(201).json({ message: 'Motorista cadastrado com sucesso' });
           }
-        });
-      })
-    })
-  }
-  catch (error) {
+        );
+      });
+    });
+}
+catch (error) {
     console.error('Erro ao cadastrar motorista:', error);
     res.status(500).json({ error: 'Erro ao cadastrar motorista' });
   }
 })
 
 app.get('/buscar-linha', async (req, res) => {
-  db.query('SELECt * FROM motorista_escola', (err, results) => {
+  db.query('SELECT * FROM motorista_escola', (err, results) => {
     if (err) {
       console.error('Erro ao buscar linhas:', err);
       res.status(500).json({ error: 'Erro ao buscar linhas' });
@@ -162,6 +177,45 @@ app.post('/filter-name-school', async (req, res) => {
     res.json(results);
   })
 });
+
+app.get('/check-login', async (req, res) => {
+  const { username, password } = req.query
+  try{
+    const [rows] = await dbPromise.query('SELECT * FROM motoristas WHERE usuario = ?', [username]);
+ 
+    if (rows.length === 0 ) {
+      return res.json({
+        succes: false,
+        message: 'Usuário não encontrado'
+      })
+    }
+
+   const user = rows[0];
+   const match = await bcrypt.compare(password, user.senha)
+  
+   if(!match) {
+    return res.json({
+      success: false,
+      message: 'Senha incorreta'
+    })
+   }
+
+    res.json({
+            success: true,
+            message: 'Login realizado com sucesso',
+            id: user.id,
+            nome: user.nome,
+            usuario: user.usuario
+    });
+
+  }catch(error) {
+    console.error(error);
+    res.status(500).json({
+      succes: false,
+      message: "Erro no servidor"
+    })
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`API rodando em http://localhost:${PORT}`);
