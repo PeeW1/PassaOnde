@@ -22,13 +22,13 @@ export default function SelectMenu({ navigation }) {
     useEffect(()=> {
         const fetchData = async () => {
             try {
-                const resMotorista = await fetch('http://192.168.0.218:3000/motoristas')
+                const resMotorista = await fetch('https://passaonde.onrender.com/motoristas')
                 const jsonMotorista = await resMotorista.json();
 
-                const resEscola = await fetch('http://192.168.0.218:3000/escolas')
+                const resEscola = await fetch('https://passaonde.onrender.com/escolas')
                 const jsonEscola = await resEscola.json(); 
 
-                const resTurno = await fetch('http://192.168.0.218:3000/turnos')
+                const resTurno = await fetch('https://passaonde.onrender.com/turnos')
                 const jsonTurno = await resTurno.json();
                 
                 setMotorista(jsonMotorista)
